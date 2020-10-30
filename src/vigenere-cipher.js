@@ -1,67 +1,74 @@
 const CustomError = require("../extensions/custom-error");
 
+  
+const ALFABET = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+let messageCharCode;
+let keyCharCode;
+let newCharCode;
+
 class VigenereCipheringMachine {
-  encrypt(message, key) {
-    if (!message || !key) {
-      throw "Not implemented";
-    }
-    let KeyMassive = key.split("");
-    let CryptoMassive = [];
-    let id = 0;
-    message.split("").forEach(element => {
-      if (
-        element.toUpperCase().charCodeAt() >= 65 &&
-        element.toUpperCase().charCodeAt() <= 90
-      ) {
-        let cryptoSymbol =
-          element.toUpperCase().charCodeAt() +
-          KeyMassive[id].toUpperCase().charCodeAt() -
-          65;
-        if (cryptoSymbol > 90) {
-          cryptoSymbol = cryptoSymbol - 90 + 64;
-        }
-        CryptoMassive.push(String.fromCharCode(cryptoSymbol));
-        id += 1;
-        if (id === KeyMassive.length) {
-          id = 0;
-        }
-      } else {
-        CryptoMassive.push(element);
-      }
-    });
-    return CryptoMassive.join("");
+  constructor(mode = true) {
+    this.mode = mode;
   }
 
-  decrypt(encryptedMessage, key) {
-    if (!encryptedMessage || !key) {
-      throw "Not implemented";
+  encrypt(message, key) {
+    const arrayKey = [];
+    const arrayRes = [];
+    this.message = message.toUpperCase();
+    this.key = key.toUpperCase();
+
+    for (let i = 0; i < this.key.length; i++) {
+      arrayKey.push(ALFABET.indexOf(this.key[i]));
     }
-    let KeyMassive = key.split("");
-    let EncryptedMassive = [];
-    let id = 0;
-    encryptedMessage.split("").forEach(element => {
-      if (
-        element.toUpperCase().charCodeAt() >= 65 &&
-        element.toUpperCase().charCodeAt() <= 90
-      ) {
-        let cryptoSymbol =
-          element.toUpperCase().charCodeAt() -
-          (KeyMassive[id].toUpperCase().charCodeAt() - 65);
-        if (cryptoSymbol < 65) {
-          cryptoSymbol = cryptoSymbol + 90 - 64;
-        }
-        EncryptedMassive.push(String.fromCharCode(cryptoSymbol));
-        id += 1;
-        if (id === KeyMassive.length) {
-          id = 0;
-        }
-      } else {
-        EncryptedMassive.push(element);
+
+    for (let j = 0, k = 0; j < this.message.length; j++, k++) {
+      if (!/[A-Z]/.test(this.message[j])) {
+        arrayRes.push(this.message[j]);
+        k -= 1;
+        continue;
       }
-    });
-    return EncryptedMassive.join("");
+      messageCharCode = ALFABET.indexOf(this.message[j]);
+      keyCharCode = (k < arrayKey.length) ? arrayKey[k] : arrayKey[k % arrayKey.length];
+      newCharCode = (messageCharCode + keyCharCode >= 26)
+        ? messageCharCode + keyCharCode - 26
+        : messageCharCode + keyCharCode;
+
+      arrayRes.push(ALFABET[newCharCode]);
+    }
+    return this.mode ? arrayRes.join('') : arrayRes.reverse().join('');
+  }
+
+  decrypt(message, key) {
+    const arrayKey = [];
+    const arrayRes = [];
+    let messageCharCode;
+    let keyCharCode;
+    let newCharCode;
+    this.message = message.toUpperCase();
+    this.key = key.toUpperCase();
+
+    for (let i = 0; i < this.key.length; i++) {
+      arrayKey.push(ALFABET.indexOf(this.key[i]));
+    }
+
+    for (let j = 0, k = 0; j < this.message.length; j++, k++) {
+      if (!/[A-Z]/.test(this.message[j])) {
+        arrayRes.push(this.message[j]);
+        k -= 1;
+        continue;
+      }
+      messageCharCode = ALFABET.indexOf(this.message[j]);
+      keyCharCode = (k < arrayKey.length) ? arrayKey[k] : arrayKey[k % arrayKey.length];
+      newCharCode = (messageCharCode - keyCharCode >= 0)
+        ? messageCharCode - keyCharCode
+        : messageCharCode - keyCharCode + 26;
+
+      arrayRes.push(ALFABET[newCharCode]);
+    }
+    return this.mode ? arrayRes.join('') : arrayRes.reverse().join('');
   }
 }
+
 
 // 1 не прохожу
 
