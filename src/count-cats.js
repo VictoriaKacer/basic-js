@@ -10,3 +10,5 @@ module.exports = function countCats(matrix) {
   }
 return m;
 };
+
+// ok
